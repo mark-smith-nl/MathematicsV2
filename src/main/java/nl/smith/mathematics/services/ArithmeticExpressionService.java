@@ -35,7 +35,7 @@ public class ArithmeticExpressionService {
 	}
 
 	public ArithmeticExpression buildArithmeticExpression(@NotEmpty String expression) {
-		Stack<PositionElementEntry<ArithmeticExpression>> arithmeticExpressionStack = new Stack<>();
+		Stack<PositionElementEntry<ArithmeticExpression>> arithmeticSubExpressionStack = new Stack<>();
 
 		ArithmeticExpression rootArithmeticExpression = new ArithmeticExpression();
 		ArithmeticExpression arithmeticExpression = rootArithmeticExpression;
@@ -44,36 +44,25 @@ public class ArithmeticExpressionService {
 			char character = expression.charAt(position);
 			AggregationToken aggregationToken = AggregationToken.aggregationTokenMap.get(character);
 			if (aggregationToken != null) {
-
 				if (aggregationToken.getTokenType() == AggregationToken.TokenType.OPEN) {
-					// Open subexpression
+					// Begin subexpression.
 					arithmeticExpression = new ArithmeticExpression(aggregationToken);
-					arithmeticExpressionStack.add(new PositionElementEntry<ArithmeticExpression>(position, arithmeticExpression));
+					arithmeticSubExpressionStack.add(new PositionElementEntry<ArithmeticExpression>(position, arithmeticExpression));
 				} else {
-					// Close subexpression.
-					if (arithmeticExpressionStack.isEmpty()) {
-						char expectedOpenToken = aggregationToken.getMatchingToken().getTokenCharacter();
-						StringBuilder message = textAnnotationService.getAnnotatedText(expression, false, position);
-						message.append(String.format("\nMissing open token '%c' for closing token '%c'.", expectedOpenToken, character));
-						throw new ArithmeticException(message.toString());
+					// Close token encountered. Validate expression is correctly
+					// closed.
+					validateCorrectClosing(aggregationToken, arithmeticSubExpressionStack, position, expression);
+
+					ArithmeticExpression subExpression = arithmeticExpression;
+
+					// Retrieve parent expression.
+					if (arithmeticSubExpressionStack.isEmpty()) {
+						arithmeticExpression = rootArithmeticExpression;
 					} else {
-						PositionElementEntry<ArithmeticExpression> positionElementEntry = arithmeticExpressionStack.pop();
-						arithmeticExpression = positionElementEntry.getElement();
-						char openToken = arithmeticExpression.getAggregationOpenToken().getTokenCharacter();
-						char expectedCloseToken = arithmeticExpression.getAggregationOpenToken().getMatchingToken().getTokenCharacter();
-						int positionOpenToken = positionElementEntry.getPosition();
-						if (expectedCloseToken != character) {
-							StringBuilder message = textAnnotationService.getAnnotatedText(expression, false, positionOpenToken, position);
-							message.append(String.format("\nWrong close token '%c' for open token '%c'. Expected '%c'.", character, openToken, expectedCloseToken));
-							throw new ArithmeticException(message.toString());
-						} else {
-							if (arithmeticExpressionStack.isEmpty()) {
-								arithmeticExpression = rootArithmeticExpression;
-							} else {
-								arithmeticExpression = arithmeticExpressionStack.peek().getElement();
-							}
-						}
+						arithmeticExpression = arithmeticSubExpressionStack.peek().getElement();
 					}
+
+					arithmeticExpression.addSubExpression(subExpression);
 				}
 			} else {
 				arithmeticExpression.addCharacter(character);
@@ -82,8 +71,8 @@ public class ArithmeticExpressionService {
 
 		Set<Integer> positions = new HashSet<>();
 		List<Character> missingClosingTokens = new ArrayList<>();
-		while (!arithmeticExpressionStack.isEmpty()) {
-			PositionElementEntry<ArithmeticExpression> positionElementEntry = arithmeticExpressionStack.pop();
+		while (!arithmeticSubExpressionStack.isEmpty()) {
+			PositionElementEntry<ArithmeticExpression> positionElementEntry = arithmeticSubExpressionStack.pop();
 			missingClosingTokens.add(positionElementEntry.getElement().getAggregationOpenToken().getMatchingToken().getTokenCharacter());
 			positions.add(positionElementEntry.getPosition());
 		}
@@ -98,4 +87,28 @@ public class ArithmeticExpressionService {
 		return rootArithmeticExpression;
 	}
 
+	private void validateCorrectClosing(AggregationToken aggregationToken, Stack<PositionElementEntry<ArithmeticExpression>> arithmeticSubExpressionStack, int position,
+			@NotEmpty String expression) {
+
+		char actualCloseToken = aggregationToken.getTokenCharacter();
+
+		if (arithmeticSubExpressionStack.isEmpty()) {
+			char expectedOpenToken = aggregationToken.getMatchingToken().getTokenCharacter();
+			StringBuilder message = textAnnotationService.getAnnotatedText(expression, false, position);
+			message.append(String.format("\nMissing open token '%c' for closing token '%c'.", expectedOpenToken, actualCloseToken));
+			throw new ArithmeticException(message.toString());
+		} else {
+			PositionElementEntry<ArithmeticExpression> positionElementEntry = arithmeticSubExpressionStack.pop();
+			ArithmeticExpression arithmeticExpression = positionElementEntry.getElement();
+			char openToken = arithmeticExpression.getAggregationOpenToken().getTokenCharacter();
+			char expectedCloseToken = arithmeticExpression.getAggregationOpenToken().getMatchingToken().getTokenCharacter();
+			int positionOpenToken = positionElementEntry.getPosition();
+			if (expectedCloseToken != aggregationToken.getTokenCharacter()) {
+				StringBuilder message = textAnnotationService.getAnnotatedText(expression, false, positionOpenToken, position);
+				message.append(String.format("\nWrong close token '%c' for open token '%c'. Expected '%c'.", actualCloseToken, openToken, expectedCloseToken));
+				throw new ArithmeticException(message.toString());
+			}
+
+		}
+	}
 }
