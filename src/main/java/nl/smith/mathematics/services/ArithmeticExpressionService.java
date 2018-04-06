@@ -8,7 +8,7 @@ import java.util.Stack;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,7 +34,7 @@ public class ArithmeticExpressionService {
 		textAnnotationService.setEndOfLineCharacter(' ');
 	}
 
-	public ArithmeticExpression buildArithmeticExpression(@NotEmpty String expression) {
+	public ArithmeticExpression buildArithmeticExpression(@NotBlank String expression) {
 		Stack<PositionElementEntry<ArithmeticExpression>> arithmeticSubExpressionStack = new Stack<>();
 
 		ArithmeticExpression rootArithmeticExpression = new ArithmeticExpression();
@@ -88,7 +88,7 @@ public class ArithmeticExpressionService {
 	}
 
 	private void validateCorrectClosing(AggregationToken aggregationToken, Stack<PositionElementEntry<ArithmeticExpression>> arithmeticSubExpressionStack, int position,
-			@NotEmpty String expression) {
+			@NotBlank String expression) {
 
 		char actualCloseToken = aggregationToken.getTokenCharacter();
 
@@ -110,5 +110,7 @@ public class ArithmeticExpressionService {
 			}
 
 		}
+
 	}
+
 }

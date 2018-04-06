@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+	
+    <appender name="CONSOLE2" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - A %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="CONSOLE3" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - B %msg%n</pattern>
+		</encoder>
+	</appender>
+
+	<logger name="nl.smith" level="debug">
+		<appender-ref ref="CONSOLE2" />
+	</logger>
+	<logger name="nl.smith.mathematics" level="debug">
+		<appender-ref ref="CONSOLE3" />
+	</logger>
+	<logger name="org.springframework.context.support.ResourceBundleMessageSource"	level="error" />
+	
+ </configuration>
