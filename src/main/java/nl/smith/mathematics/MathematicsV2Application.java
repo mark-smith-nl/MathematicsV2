@@ -12,7 +12,7 @@ import nl.smith.mathematics.services.ArithmeticExpressionService;
 @SpringBootApplication
 public class MathematicsV2Application implements CommandLineRunner {
 
-	private final Logger logger = LoggerFactory.getLogger(this.getClass());
+	private final Logger LOGGER = LoggerFactory.getLogger(MathematicsV2Application.class);
 
 	@Autowired
 	private ArithmeticExpressionService arithmeticExpressionService;

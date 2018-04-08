@@ -1,67 +1,72 @@
 package nl.smith.mathematics.domain;
 
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 
-public class ArithmeticExpression {
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-	private final AggregationToken aggregationOpenToken;
+import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
+
+public class ArithmeticExpression extends AbstractArithmeticExpression {
+
+	private final Logger LOGGER = LoggerFactory.getLogger(ArithmeticExpression.class);
 
 	private StringBuilder expression = new StringBuilder();
 
-	private Stack<PositionElementEntry<ArithmeticExpression>> subExpressions = new Stack<>();
+	private List<PositionElementEntry<AbstractArithmeticExpression>> subExpressions = new ArrayList<>();
+
+	private int insertPosition = 0;
 
 	public ArithmeticExpression() {
 		this(null);
 	}
 
 	public ArithmeticExpression(AggregationToken aggregationOpenToken) {
-		this.aggregationOpenToken = aggregationOpenToken;
+		super(aggregationOpenToken);
+
+		insertPosition = aggregationOpenToken == null ? 0 : 1;
 	}
 
+	@Override
 	public int getLength() {
-		int length = expression.length();
-
-		for (PositionElementEntry<ArithmeticExpression> positionSubExpressionEntry : subExpressions) {
-			length += positionSubExpressionEntry.getElement().getLength();
-		}
-
-		if (aggregationOpenToken != null) {
-			length += 2;
-		}
-
-		return length;
+		return insertPosition + (aggregationOpenToken == null ? 0 : 1);
 	}
 
 	public void addCharacter(char character) {
 		expression.append(character);
+		insertPosition++;
 	}
 
-	public void addSubExpression(ArithmeticExpression subExpression) {
-		subExpressions.add(new PositionElementEntry<ArithmeticExpression>(getLength(), subExpression));
+	@Override
+	public void addExpression(AbstractArithmeticExpression subExpression) {
+		subExpressions.add(new PositionElementEntry<AbstractArithmeticExpression>(insertPosition, subExpression));
+		LOGGER.info("Add subexpression at position: {}", insertPosition);
+		insertPosition += subExpression.getLength();
 	}
 
-	public StringBuilder toStringBuilder() {
-		StringBuilder result = expression;
+	public String getExpression() {
+		return expression.toString();
+	}
+
+	@Override
+	public StringBuilder asStringBuilder() {
+		StringBuilder result = new StringBuilder();
+		if (aggregationOpenToken != null) {
+			result.append(aggregationOpenToken.getTokenCharacter());
+		}
+
+		result.append(expression);
 
 		subExpressions.forEach(subExpression -> {
-			result.insert(subExpression.getPosition(), subExpression.getElement().toString());
+			result.insert(subExpression.getPosition(), subExpression.getElement().asStringBuilder());
 		});
 
 		if (aggregationOpenToken != null) {
-			result.insert(0, aggregationOpenToken.getTokenCharacter());
 			result.append(aggregationOpenToken.getMatchingToken().getTokenCharacter());
 		}
 
 		return result;
-	}
-
-	@Override
-	public String toString() {
-		return toStringBuilder().toString();
-	}
-
-	public AggregationToken getAggregationOpenToken() {
-		return aggregationOpenToken;
 	}
 
 }
