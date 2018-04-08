@@ -94,22 +94,19 @@ public class ArithmeticExpressionServiceTest {
 	public void buildArithmeticExpression() {
 		List<String> expressions = new ArrayList<>();
 
-		// expressions.add("1 + 2");
-		// expressions.add("1 + 2 * (7 + 4)");
-		// expressions.add("1 + 2 * (7 + 4) - 8 / (1 - 8)");
+		expressions.add("1 + 2");
+		expressions.add("1 + 2 * (7 + 4)");
+		expressions.add("1 + 2 * (7 + 4) - 8 / (1 - 8)");
 		expressions.add("1 + 2 * 5 * 4 * 7 * [7 + 4 * {9 - 2}] - 8 / (1 - 8)");
 
 		expressions.forEach((expression) -> {
 
-			System.out.println(expression);
-			System.out.println("01234567890123456789012345678901234567890");
 			ArithmeticExpression arithmeticExpression = arithmeticExpressionService.buildArithmeticExpression(expression);
 
-			System.out.println(arithmeticExpression);
-			// String actualExpression = arithmeticExpression.toString();
-			// String expectedExpression = expression;
+			String actualExpression = arithmeticExpression.toString();
+			String expectedExpression = expression;
 
-			// assertThat(actualExpression, is(expectedExpression));
+			assertThat(actualExpression, is(expectedExpression));
 
 		});
 	}
