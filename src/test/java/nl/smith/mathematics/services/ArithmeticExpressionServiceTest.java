@@ -55,7 +55,7 @@ public class ArithmeticExpressionServiceTest {
 		Map<String, String> expressionMessageMap = new HashMap<>();
 
 		// @formatter:off
- 		expressionMessageMap.put("2 + (", "\n" +
+ 		/*expressionMessageMap.put("2 + (", "\n" +
                                  "2 + (" + " \n" + 
                                  "    ^" + " \n" + 
                                  "Missing closing tokens: ')'.");
@@ -63,17 +63,17 @@ public class ArithmeticExpressionServiceTest {
 		expressionMessageMap.put("2 + (4*{", "\n" + 
                                  "2 + (4*{" + " \n" + 
                                  "    ^  ^" + " \n" +
-                                 "Missing closing tokens: '}', ')'.");
+                                 "Missing closing tokens: '}', ')'.");*/
 		
 		expressionMessageMap.put("2 + (4*3] - 7", "\n" + 
                                  "2 + (4*3] - 7" + " \n" + 
                                  "    ^   ^    " + " \n" +
                                  "Wrong close token ']' for open token '('. Expected ')'.");
 		
-		expressionMessageMap.put("2 + (4*3) - 7) + 2", "\n" + 
+		/*expressionMessageMap.put("2 + (4*3) - 7) + 2", "\n" + 
                                  "2 + (4*3) - 7) + 2" + " \n" + 
                                  "             ^    " + " \n" +
-                                 "Missing open token '(' for closing token ')'.");
+                                 "Missing open token '(' for closing token ')'.");*/
 		// @formatter:on
 
 		expressionMessageMap.forEach((expression, message) -> {

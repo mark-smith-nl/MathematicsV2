@@ -14,35 +14,34 @@ public class ArithmeticExpression extends AbstractArithmeticExpression {
 
 	private StringBuilder expression = new StringBuilder();
 
-	private List<PositionElementEntry<AbstractArithmeticExpression>> subExpressions = new ArrayList<>();
-
-	private int insertPosition = 0;
+	private List<AbstractArithmeticExpression> subExpressions = new ArrayList<>();
 
 	public ArithmeticExpression() {
-		this(null);
+		this(null, 0);
+	}
+
+	public ArithmeticExpression(int position) {
+		this(null, position);
 	}
 
 	public ArithmeticExpression(AggregationToken aggregationOpenToken) {
-		super(aggregationOpenToken);
-
-		insertPosition = aggregationOpenToken == null ? 0 : 1;
+		this(aggregationOpenToken, 0);
 	}
 
-	@Override
-	public int getLength() {
-		return insertPosition + (aggregationOpenToken == null ? 0 : 1);
+	public ArithmeticExpression(AggregationToken aggregationOpenToken, int position) {
+		super(aggregationOpenToken, position);
 	}
 
 	public void addCharacter(char character) {
 		expression.append(character);
-		insertPosition++;
 	}
 
 	@Override
 	public void addExpression(AbstractArithmeticExpression subExpression) {
-		subExpressions.add(new PositionElementEntry<AbstractArithmeticExpression>(insertPosition, subExpression));
-		LOGGER.info("Add subexpression at position: {}", insertPosition);
-		insertPosition += subExpression.getLength();
+		subExpressions.add(subExpression);
+
+		int relativePosition = subExpression.position - position;
+		LOGGER.info("Added subexpression '{}' at position {} (relative position ({}).", subExpression, subExpression.position, relativePosition);
 	}
 
 	public String getExpression() {
@@ -59,14 +58,20 @@ public class ArithmeticExpression extends AbstractArithmeticExpression {
 		result.append(expression);
 
 		subExpressions.forEach(subExpression -> {
-			result.insert(subExpression.getPosition(), subExpression.getElement().asStringBuilder());
+			int relativePosition = subExpression.position - position;
+			result.insert(relativePosition, subExpression.asStringBuilder());
 		});
 
-		if (aggregationOpenToken != null) {
+		if (aggregationOpenToken != null && closed) {
 			result.append(aggregationOpenToken.getMatchingToken().getTokenCharacter());
 		}
 
 		return result;
+	}
+
+	@Override
+	public int getLength() {
+		return asStringBuilder().length();
 	}
 
 }

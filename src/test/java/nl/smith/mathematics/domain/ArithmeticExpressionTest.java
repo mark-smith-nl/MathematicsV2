@@ -13,7 +13,10 @@ public class ArithmeticExpressionTest {
 	public void expression_NoAggregationOpenToken_NoContent() {
 		ArithmeticExpression arithmeticExpression = new ArithmeticExpression();
 
-		assertThat(arithmeticExpression.getLength(), is(0));
+		assertThat(arithmeticExpression.toString(), is("..."));
+
+		arithmeticExpression.close();
+
 		assertThat(arithmeticExpression.toString(), is(""));
 	}
 
@@ -24,7 +27,10 @@ public class ArithmeticExpressionTest {
 		arithmeticExpression.addCharacter('+');
 		arithmeticExpression.addCharacter('2');
 
-		assertThat(arithmeticExpression.getLength(), is(3));
+		assertThat(arithmeticExpression.toString(), is("1+2..."));
+
+		arithmeticExpression.close();
+
 		assertThat(arithmeticExpression.toString(), is("1+2"));
 	}
 
@@ -32,7 +38,10 @@ public class ArithmeticExpressionTest {
 	public void expression_WithAggregationOpenToken_NoContent() {
 		ArithmeticExpression arithmeticExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('('));
 
-		assertThat(arithmeticExpression.getLength(), is(2));
+		assertThat(arithmeticExpression.toString(), is("(..."));
+
+		arithmeticExpression.closeWithToken(')');
+
 		assertThat(arithmeticExpression.toString(), is("()"));
 	}
 
@@ -43,7 +52,10 @@ public class ArithmeticExpressionTest {
 		arithmeticExpression.addCharacter('+');
 		arithmeticExpression.addCharacter('2');
 
-		assertThat(arithmeticExpression.getLength(), is(5));
+		assertThat(arithmeticExpression.toString(), is("(1+2..."));
+
+		arithmeticExpression.closeWithToken(')');
+
 		assertThat(arithmeticExpression.toString(), is("(1+2)"));
 	}
 
@@ -55,26 +67,30 @@ public class ArithmeticExpressionTest {
 		arithmeticExpression.addCharacter('2');
 		arithmeticExpression.addCharacter('*');
 
-		ArithmeticExpression arithmeticSubExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('{'));
+		assertThat(arithmeticExpression.toString(), is("1+2*..."));
+
+		ArithmeticExpression arithmeticSubExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('{'), arithmeticExpression.getLength());
+		arithmeticExpression.addExpression(arithmeticSubExpression);
 		arithmeticSubExpression.addCharacter('3');
 		arithmeticSubExpression.addCharacter('/');
 		arithmeticSubExpression.addCharacter('4');
 		arithmeticSubExpression.addCharacter('+');
 		arithmeticSubExpression.addCharacter('5');
+		arithmeticSubExpression.closeWithToken('}');
 
-		arithmeticExpression.addExpression(arithmeticSubExpression);
+		assertThat(arithmeticExpression.toString(), is("1+2*{3/4+5}..."));
 
 		arithmeticExpression.addCharacter('-');
 		arithmeticExpression.addCharacter('6');
 		arithmeticExpression.addCharacter('+');
-		arithmeticSubExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('['));
+		arithmeticSubExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('['), arithmeticExpression.getLength());
+		arithmeticExpression.addExpression(arithmeticSubExpression);
 		arithmeticSubExpression.addCharacter('7');
 		arithmeticSubExpression.addCharacter('/');
 		arithmeticSubExpression.addCharacter('8');
+		arithmeticSubExpression.closeWithToken(']');
+		arithmeticExpression.close();
 
-		arithmeticExpression.addExpression(arithmeticSubExpression);
-
-		assertThat(arithmeticExpression.getLength(), is(19));
 		assertThat(arithmeticExpression.toString(), is("1+2*{3/4+5}-6+[7/8]"));
 	}
 }
