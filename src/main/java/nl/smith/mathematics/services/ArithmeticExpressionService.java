@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import nl.smith.mathematics.domain.AggregationTokenSets;
 import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
 import nl.smith.mathematics.domain.ArithmeticExpression;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
 
 @Validated
 @Service
@@ -52,7 +53,11 @@ public class ArithmeticExpressionService {
 				} else {
 					// Close token encountered. Validate expression is correctly
 					// closed.
-					arithmeticExpression.closeWithToken(character);
+					try {
+						arithmeticExpression.closeWithToken(character);
+					} catch (ArithmeticExpressionCloseException e) {
+						throw new ArithmeticException(e.getMessage() + textAnnotationService.getAnnotatedText(expression, false, e.getPositions()));
+					}
 
 					// Retrieve parent expression.
 					arithmeticExpression = arithmeticSubExpressionStack.peek();
@@ -81,37 +86,5 @@ public class ArithmeticExpressionService {
 
 		return arithmeticExpression;
 	}
-
-	/*
-	 * private void validateCorrectClosing(AggregationToken aggregationToken,
-	 * Stack<PositionElementEntry<ArithmeticExpression>>
-	 * arithmeticSubExpressionStack, int position,
-	 * 
-	 * @NotBlank String expression) {
-	 * 
-	 * char actualCloseToken = aggregationToken.getTokenCharacter();
-	 * 
-	 * if (arithmeticSubExpressionStack.isEmpty()) { char expectedOpenToken =
-	 * aggregationToken.getMatchingToken().getTokenCharacter(); StringBuilder
-	 * message = textAnnotationService.getAnnotatedText(expression, false,
-	 * position); message.append(String.
-	 * format("\nMissing open token '%c' for closing token '%c'.",
-	 * expectedOpenToken, actualCloseToken)); throw new
-	 * ArithmeticException(message.toString()); } else {
-	 * PositionElementEntry<ArithmeticExpression> positionElementEntry =
-	 * arithmeticSubExpressionStack.pop(); ArithmeticExpression
-	 * arithmeticExpression = positionElementEntry.getElement(); char openToken
-	 * = arithmeticExpression.getAggregationOpenToken().getTokenCharacter();
-	 * char expectedCloseToken =
-	 * arithmeticExpression.getAggregationOpenToken().getMatchingToken().
-	 * getTokenCharacter(); int positionOpenToken =
-	 * positionElementEntry.getPosition(); if (expectedCloseToken !=
-	 * aggregationToken.getTokenCharacter()) { StringBuilder message =
-	 * textAnnotationService.getAnnotatedText(expression, false,
-	 * positionOpenToken, position); message.append(String.
-	 * format("\nWrong close token '%c' for open token '%c'. Expected '%c'.",
-	 * actualCloseToken, openToken, expectedCloseToken)); throw new
-	 * ArithmeticException(message.toString()); } } }
-	 */
 
 }

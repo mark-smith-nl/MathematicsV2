@@ -48,16 +48,23 @@ public abstract class AbstractArithmeticExpression {
 	}
 
 	public void closeWithToken(char closeToken) throws ArithmeticExpressionCloseException {
-		if (aggregationOpenToken != null && aggregationOpenToken.getMatchingToken().getTokenCharacter() != closeToken) {
-			throw new ArithmeticExpressionCloseException(1, 2, "ssss");
+		if (aggregationOpenToken == null) {
+			throw new ArithmeticExpressionCloseException(String.format("Expression does not require the closetoken '%c'.", closeToken));
+		}
+
+		char expectedCloseToken = aggregationOpenToken.getMatchingToken().getTokenCharacter();
+		if (expectedCloseToken != closeToken) {
+			throw new ArithmeticExpressionCloseException(
+					String.format("Expression can not be close with closetoken '%c'. Expected closetoken '%c'.", closeToken, expectedCloseToken), position);
 		}
 
 		closed = true;
 	}
 
-	public void close() {
+	public void close() throws ArithmeticExpressionCloseException {
 		if (aggregationOpenToken != null) {
-			throw new ArithmeticException("Isse nie goe 2");
+			char expectedCloseToken = aggregationOpenToken.getMatchingToken().getTokenCharacter();
+			throw new ArithmeticExpressionCloseException(String.format("Expression requires the closetoken '%c'.", expectedCloseToken));
 		}
 
 		closed = true;

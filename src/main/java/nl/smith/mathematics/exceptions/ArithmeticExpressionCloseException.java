@@ -2,8 +2,17 @@ package nl.smith.mathematics.exceptions;
 
 public class ArithmeticExpressionCloseException extends Exception {
 
-	public ArithmeticExpressionCloseException(int i, int j, String string) {
-		// TODO Auto-generated constructor stub
+	private static final long serialVersionUID = 1L;
+
+	private final int[] positions;
+
+	public ArithmeticExpressionCloseException(String message, int... positions) {
+		super(message);
+		this.positions = positions;
+	}
+
+	public int[] getPositions() {
+		return positions;
 	}
 
 }
