@@ -7,17 +7,33 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
 
-public class ArithmeticExpression extends AbstractArithmeticExpression {
+public class ArithmeticExpression {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(ArithmeticExpression.class);
 
+	private final String VALID_CHARACTERS = "[a-zA-Z_\\s\\d\\^\\-\\*/\\+\\.]";
+
+	private final AggregationToken aggregationOpenToken;
+
+	private final int position;
+
+	private boolean closed;
+
 	private StringBuilder expression = new StringBuilder();
 
-	private List<AbstractArithmeticExpression> subExpressions = new ArrayList<>();
+	private List<ArithmeticExpression> subExpressions = new ArrayList<>();
+
+	private List<ArithmeticExpression> siblingExpressions = new ArrayList<>();
 
 	public ArithmeticExpression() {
 		this(null, 0);
+	}
+
+	public ArithmeticExpression(char character) {
+		throw new IllegalArgumentException("Constructor can not be invoked using a character argument.\n"
+				+ "Did you mean to use the constructor with an integer argument in which the argument specifies the absolute begin positien of the expression?");
 	}
 
 	public ArithmeticExpression(int position) {
@@ -28,31 +44,115 @@ public class ArithmeticExpression extends AbstractArithmeticExpression {
 		this(aggregationOpenToken, 0);
 	}
 
-	public ArithmeticExpression(AggregationToken aggregationOpenToken, int position) {
-		super(aggregationOpenToken, position);
+	public ArithmeticExpression(AggregationToken aggregationToken, int position) {
+		if (aggregationToken != null && !aggregationToken.isOpenToken()) {
+			throw new IllegalArgumentException("Token is not an opentoken.");
+		}
+
+		this.aggregationOpenToken = aggregationToken;
+		this.position = position;
+
+		if (aggregationOpenToken == null) {
+			LOGGER.info("Created expression... at position {}.", position);
+		} else {
+			LOGGER.info("Created expression {}... at position {}.", aggregationOpenToken.getTokenCharacter(), position);
+		}
 	}
 
-	public void addCharacter(char character) {
-		expression.append(character);
+	private ArithmeticExpression(ArithmeticExpression arithmeticExpression) {
+		this(null, arithmeticExpression.position + arithmeticExpression.getLength());
+
+		expression = arithmeticExpression.expression;
+		subExpressions = arithmeticExpression.subExpressions;
+
+		closeExpression();
 	}
 
-	@Override
-	public void addExpression(AbstractArithmeticExpression subExpression) {
+	public void add(char character) throws ArithmeticExpressionCloseException {
+		if (closed) {
+			// TODO Test
+			throw new IllegalStateException("Closed arithmetic expression can not be appended.");
+		}
+
+		if (character == ',') {
+			addCurrentExpressionAsSibling();
+		} else {
+			validCharacter(character);
+			expression.append(character);
+		}
+	}
+
+	public void add(ArithmeticExpression subExpression) {
+		if (closed) {
+			// TODO Test
+			throw new IllegalStateException("Closed arithmetic expression can not be appended.");
+		}
+
 		subExpressions.add(subExpression);
 
 		int relativePosition = subExpression.position - position;
 		LOGGER.info("Added subexpression '{}' at position {} (relative position ({}).", subExpression, subExpression.position, relativePosition);
 	}
 
+	public void close(char closeToken) throws ArithmeticExpressionCloseException {
+		if (aggregationOpenToken == null) {
+			throw new ArithmeticExpressionCloseException(String.format("Expression does not require the closetoken '%c'.", closeToken));
+		}
+
+		char expectedCloseToken = aggregationOpenToken.getMatchingToken().getTokenCharacter();
+		if (expectedCloseToken != closeToken) {
+			throw new ArithmeticExpressionCloseException(
+					String.format("Expression can not be close with closetoken '%c'. Expected closetoken '%c'.", closeToken, expectedCloseToken), position);
+		}
+
+		closeExpression();
+	}
+
+	public void close() throws ArithmeticExpressionCloseException {
+		if (aggregationOpenToken != null) {
+			char expectedCloseToken = aggregationOpenToken.getMatchingToken().getTokenCharacter();
+			throw new ArithmeticExpressionCloseException(String.format("Expression requires the closetoken '%c'.", expectedCloseToken));
+		}
+
+		closeExpression();
+	}
+
+	private void closeExpression() {
+		if (!siblingExpressions.isEmpty()) {
+			addCurrentExpressionAsSibling();
+		}
+
+		closed = true;
+	}
+
+	public AggregationToken getAggregationOpenToken() {
+		return aggregationOpenToken;
+	}
+
+	public int getPosition() {
+		return position;
+	}
+
 	public String getExpression() {
 		return expression.toString();
 	}
 
-	@Override
 	public StringBuilder asStringBuilder() {
 		StringBuilder result = new StringBuilder();
 		if (aggregationOpenToken != null) {
 			result.append(aggregationOpenToken.getTokenCharacter());
+		}
+
+		if (!siblingExpressions.isEmpty()) {
+
+			result.append(siblingExpressions.get(0).asStringBuilder());
+			for (int i = 1; i < siblingExpressions.size(); i++) {
+				result.append(String.valueOf(',') + siblingExpressions.get(i).asStringBuilder());
+			}
+
+			if (!closed) {
+				result.append(String.valueOf(','));
+			}
 		}
 
 		result.append(expression);
@@ -69,9 +169,28 @@ public class ArithmeticExpression extends AbstractArithmeticExpression {
 		return result;
 	}
 
-	@Override
 	public int getLength() {
 		return asStringBuilder().length();
+	}
+
+	@Override
+	public String toString() {
+		return asStringBuilder().toString() + (closed ? "" : "...");
+	}
+
+	private void validCharacter(char character) throws ArithmeticExpressionCloseException {
+		// TODO Test
+		if (!String.valueOf(character).matches(VALID_CHARACTERS)) {
+			throw new ArithmeticExpressionCloseException(String.format("Illegal character '%c'.\n Accepted expression characters are %s.", character, VALID_CHARACTERS));
+		}
+
+	}
+
+	private void addCurrentExpressionAsSibling() {
+		siblingExpressions.add(new ArithmeticExpression(this));
+
+		expression = new StringBuilder();
+		subExpressions = new ArrayList<>();
 	}
 
 }

@@ -44,7 +44,7 @@ public class ArithmeticExpressionServiceTest {
 				throw new IllegalArgumentException(
 						"The method argument for building a arithmetic expression was accepted while a ConstraintViolationException should have been thrown.");
 			} catch (ConstraintViolationException e) {
-				LOGGER.info("Expected exception was thrown for method argument.");
+				LOGGER.info("Expected exception was thrown.");
 			}
 
 		});

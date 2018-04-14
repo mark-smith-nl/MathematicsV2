@@ -46,24 +46,27 @@ public class ArithmeticExpressionService {
 				if (aggregationToken.isOpenToken()) {
 					// Begin subexpression.
 					ArithmeticExpression subExpression = new ArithmeticExpression(aggregationToken, position);
-					arithmeticExpression.addExpression(subExpression);
+					arithmeticExpression.add(subExpression);
 					arithmeticSubExpressionStack.add(arithmeticExpression);
 					arithmeticExpression = subExpression;
 
 				} else {
-					// Close token encountered. Validate expression is correctly
-					// closed.
 					try {
-						arithmeticExpression.closeWithToken(character);
+						arithmeticExpression.close(character);
 					} catch (ArithmeticExpressionCloseException e) {
 						throw new ArithmeticException(e.getMessage() + textAnnotationService.getAnnotatedText(expression, false, e.getPositions()));
 					}
 
 					// Retrieve parent expression.
-					arithmeticExpression = arithmeticSubExpressionStack.peek();
+					arithmeticExpression = arithmeticSubExpressionStack.pop();
 				}
 			} else {
-				arithmeticExpression.addCharacter(character);
+				try {
+					arithmeticExpression.add(character);
+				} catch (ArithmeticExpressionCloseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -82,7 +85,12 @@ public class ArithmeticExpressionService {
 			throw new ArithmeticException(message.toString());
 		}
 
-		arithmeticExpression.close();
+		try {
+			arithmeticExpression.close();
+		} catch (ArithmeticExpressionCloseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		return arithmeticExpression;
 	}
