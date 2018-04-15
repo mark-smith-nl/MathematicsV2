@@ -65,10 +65,10 @@ public class ArithmeticExpressionServiceTest {
                                  "    ^  ^" + " \n" +
                                  "Missing closing tokens: '}', ')'.");*/
 		
-		expressionMessageMap.put("2 + (4*3] - 7", "\n" + 
+		expressionMessageMap.put("2 + (4*3] - 7", 
+				                 "Expression can not be close with closetoken ']'. Expected closetoken ')'.\n" + 
                                  "2 + (4*3] - 7" + " \n" + 
-                                 "    ^   ^    " + " \n" +
-                                 "Wrong close token ']' for open token '('. Expected ')'.");
+                                 "    ^   ^     ");
 		
 		/*expressionMessageMap.put("2 + (4*3) - 7) + 2", "\n" + 
                                  "2 + (4*3) - 7) + 2" + " \n" + 

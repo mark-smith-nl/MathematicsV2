@@ -8,6 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionMissingCloseTokenException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionUnexpectedCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionWongCloseTokenException;
 
 public class ArithmeticExpression {
 
@@ -96,13 +99,12 @@ public class ArithmeticExpression {
 
 	public void close(char closeToken) throws ArithmeticExpressionCloseException {
 		if (aggregationOpenToken == null) {
-			throw new ArithmeticExpressionCloseException(String.format("Expression does not require the closetoken '%c'.", closeToken));
+			throw new ArithmeticExpressionUnexpectedCloseException(closeToken);
 		}
 
 		char expectedCloseToken = aggregationOpenToken.getMatchingToken().getTokenCharacter();
 		if (expectedCloseToken != closeToken) {
-			throw new ArithmeticExpressionCloseException(
-					String.format("Expression can not be close with closetoken '%c'. Expected closetoken '%c'.", closeToken, expectedCloseToken), position);
+			throw new ArithmeticExpressionWongCloseTokenException(closeToken, expectedCloseToken);
 		}
 
 		closeExpression();
@@ -111,7 +113,7 @@ public class ArithmeticExpression {
 	public void close() throws ArithmeticExpressionCloseException {
 		if (aggregationOpenToken != null) {
 			char expectedCloseToken = aggregationOpenToken.getMatchingToken().getTokenCharacter();
-			throw new ArithmeticExpressionCloseException(String.format("Expression requires the closetoken '%c'.", expectedCloseToken));
+			throw new ArithmeticExpressionMissingCloseTokenException(expectedCloseToken);
 		}
 
 		closeExpression();
