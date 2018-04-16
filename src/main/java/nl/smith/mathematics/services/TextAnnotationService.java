@@ -126,13 +126,14 @@ public class TextAnnotationService {
 		return linesWithPositionsToAnnotate;
 	}
 
-	private String getFormatString(boolean showLineNumbers, int numberOfLines) {
+	private static String getFormatString(boolean showLineNumbers, int numberOfLines) {
 		if (showLineNumbers) {
 			int maxDigits = String.valueOf(numberOfLines).length();
 			return "\n%2$" + maxDigits + "d - %1$s";
-		} else {
-			return "\n%s";
 		}
+
+		return "\n%s";
+
 	}
 
 	private static class LineWithPositionsToAnnotate {

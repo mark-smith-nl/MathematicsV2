@@ -180,6 +180,11 @@ public class ArithmeticExpression {
 		return asStringBuilder().toString() + (closed ? "" : "...");
 	}
 
+	public String toStringWithExpressionParameters() {
+		// TODO Implement
+		return null;
+	}
+
 	private void validCharacter(char character) throws ArithmeticExpressionCloseException {
 		// TODO Test
 		if (!String.valueOf(character).matches(VALID_CHARACTERS)) {

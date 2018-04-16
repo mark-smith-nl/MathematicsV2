@@ -56,7 +56,7 @@ public class ArithmeticExpressionTest {
 			throw new IllegalArgumentException(String.format("An exception of type '%s' should have been thrown.", ArithmeticExpressionCloseException.class));
 		} catch (ArithmeticExpressionCloseException e) {
 			LOGGER.info("An expected exception of type '{}' was thrown.", ArithmeticExpressionCloseException.class);
-			assertThat(e.getMessage(), is("Expression does not require the closetoken ')'."));
+			assertThat(e.getMessage(), is("Expression does not require a closetoken. Remove closetoken ')'."));
 		}
 
 	}

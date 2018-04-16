@@ -18,6 +18,8 @@ import nl.smith.mathematics.domain.AggregationTokenSets;
 import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
 import nl.smith.mathematics.domain.ArithmeticExpression;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionUnexpectedCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionWongCloseTokenException;
 
 @Validated
 @Service
@@ -34,13 +36,13 @@ public class ArithmeticExpressionService {
 		textAnnotationService.setEndOfLineCharacter(' ');
 	}
 
-	public ArithmeticExpression buildArithmeticExpression(@NotBlank String expression) {
+	public ArithmeticExpression buildArithmeticExpression(@NotBlank String rawEexpression) {
 		ArithmeticExpression arithmeticExpression = new ArithmeticExpression();
 		Stack<ArithmeticExpression> arithmeticExpressionStack = new Stack<>();
 		arithmeticExpressionStack.push(arithmeticExpression);
 
-		for (int position = 0; position < expression.length(); position++) {
-			char character = expression.charAt(position);
+		for (int position = 0; position < rawEexpression.length(); position++) {
+			char character = rawEexpression.charAt(position);
 			AggregationToken aggregationToken = aggregationTokenSets.getAggregationTokenForCharacter(character);
 			if (aggregationToken != null) {
 				if (aggregationToken.isOpenToken()) {
@@ -53,11 +55,17 @@ public class ArithmeticExpressionService {
 						arithmeticExpression = arithmeticExpressionStack.peek();
 						arithmeticExpression.add(subExpression);
 					} catch (ArithmeticExpressionCloseException e) {
-						// TODO Generate proper message.
-						throw new ArithmeticException(e.getMessage()); /// +
-																		/// textAnnotationService.getAnnotatedText(expression,
-																		/// false,
-																		/// e.getPositions()));
+						if (e instanceof ArithmeticExpressionWongCloseTokenException) {
+							StringBuilder message = new StringBuilder(e.getMessage());
+							message.append(textAnnotationService.getAnnotatedText(rawEexpression, false, arithmeticExpression.getPosition(), position));
+							throw new ArithmeticException(message.toString());
+						} else if (e instanceof ArithmeticExpressionUnexpectedCloseException) {
+							StringBuilder message = new StringBuilder(e.getMessage());
+							message.append(textAnnotationService.getAnnotatedText(rawEexpression, false, position));
+							throw new ArithmeticException(message.toString());
+						}
+
+						throw new IllegalStateException(e.getMessage());
 					}
 				}
 			} else {
@@ -74,7 +82,7 @@ public class ArithmeticExpressionService {
 			try {
 				arithmeticExpression.close();
 			} catch (ArithmeticExpressionCloseException e) {
-				throw new RuntimeException(e.getMessage());
+				throw new IllegalStateException(e.getMessage());
 			}
 		} else {
 			arithmeticExpressionStack.remove(0);
@@ -87,8 +95,8 @@ public class ArithmeticExpressionService {
 			}
 
 			List<String> missingClosingTokensAsString = missingClosingTokens.stream().map(e -> '\'' + e.toString() + '\'').collect(Collectors.toList());
-			StringBuilder message = textAnnotationService.getAnnotatedText(expression, false, positions);
-			message.append("\nMissing closing tokens: " + String.join(", ", missingClosingTokensAsString) + ".");
+			StringBuilder message = new StringBuilder("\nMissing closing tokens: " + String.join(", ", missingClosingTokensAsString) + ".");
+			message.append(textAnnotationService.getAnnotatedText(rawEexpression, false, positions));
 			throw new ArithmeticException(message.toString());
 		}
 

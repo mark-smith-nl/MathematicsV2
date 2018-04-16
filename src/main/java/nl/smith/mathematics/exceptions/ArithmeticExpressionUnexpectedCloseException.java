@@ -5,6 +5,6 @@ public class ArithmeticExpressionUnexpectedCloseException extends ArithmeticExpr
 	private static final long serialVersionUID = 1L;
 
 	public ArithmeticExpressionUnexpectedCloseException(char closeToken) {
-		super(String.format("Expression does not require the closetoken '%c'.", closeToken));
+		super(String.format("Expression does not require a closetoken. Remove closetoken '%c'.", closeToken));
 	}
 }
