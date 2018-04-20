@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionIllegalCharacterException;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionMissingCloseTokenException;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionUnexpectedCloseException;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionWongCloseTokenException;
@@ -71,7 +72,7 @@ public class ArithmeticExpression {
 		closeExpression();
 	}
 
-	public void add(char character) throws ArithmeticExpressionCloseException {
+	public void add(char character) throws ArithmeticExpressionIllegalCharacterException {
 		if (closed) {
 			// TODO Test
 			throw new IllegalStateException("Closed arithmetic expression can not be appended.");
@@ -185,10 +186,10 @@ public class ArithmeticExpression {
 		return null;
 	}
 
-	private void validCharacter(char character) throws ArithmeticExpressionCloseException {
+	private void validCharacter(char character) throws ArithmeticExpressionIllegalCharacterException {
 		// TODO Test
 		if (!String.valueOf(character).matches(VALID_CHARACTERS)) {
-			throw new ArithmeticExpressionCloseException(String.format("Illegal character '%c'.\n Accepted expression characters are %s.", character, VALID_CHARACTERS));
+			throw new ArithmeticExpressionIllegalCharacterException(String.format("Illegal character '%c'.\n Accepted expression characters are %s.", character, VALID_CHARACTERS));
 		}
 
 	}

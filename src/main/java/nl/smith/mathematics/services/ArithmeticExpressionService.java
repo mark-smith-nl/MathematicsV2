@@ -18,6 +18,7 @@ import nl.smith.mathematics.domain.AggregationTokenSets;
 import nl.smith.mathematics.domain.AggregationTokenSets.AggregationToken;
 import nl.smith.mathematics.domain.ArithmeticExpression;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionIllegalCharacterException;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionUnexpectedCloseException;
 import nl.smith.mathematics.exceptions.ArithmeticExpressionWongCloseTokenException;
 
@@ -71,8 +72,8 @@ public class ArithmeticExpressionService {
 			} else {
 				try {
 					arithmeticExpression.add(character);
-				} catch (ArithmeticExpressionCloseException e) {
-					e.printStackTrace();
+				} catch (ArithmeticExpressionIllegalCharacterException e) {
+					throw new ArithmeticException(e.getMessage());
 				}
 			}
 		}
@@ -95,7 +96,7 @@ public class ArithmeticExpressionService {
 			}
 
 			List<String> missingClosingTokensAsString = missingClosingTokens.stream().map(e -> '\'' + e.toString() + '\'').collect(Collectors.toList());
-			StringBuilder message = new StringBuilder("\nMissing closing tokens: " + String.join(", ", missingClosingTokensAsString) + ".");
+			StringBuilder message = new StringBuilder("Missing closing tokens: " + String.join(", ", missingClosingTokensAsString) + ".");
 			message.append(textAnnotationService.getAnnotatedText(rawEexpression, false, positions));
 			throw new ArithmeticException(message.toString());
 		}

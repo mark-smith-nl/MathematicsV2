@@ -55,25 +55,24 @@ public class ArithmeticExpressionServiceTest {
 		Map<String, String> expressionMessageMap = new HashMap<>();
 
 		// @formatter:off
- 		/*expressionMessageMap.put("2 + (", "\n" +
-                                 "2 + (" + " \n" + 
-                                 "    ^" + " \n" + 
-                                 "Missing closing tokens: ')'.");
+ 		expressionMessageMap.put("2 + (", 
+                                 "Missing closing tokens: ')'.\n" +
+                                 "2 + ("                               + " \n" +
+                                 "    ^ ");
  		
-		expressionMessageMap.put("2 + (4*{", "\n" + 
-                                 "2 + (4*{" + " \n" + 
-                                 "    ^  ^" + " \n" +
-                                 "Missing closing tokens: '}', ')'.");*/
-		
+		expressionMessageMap.put("2 + (4*{",
+                                 "Missing closing tokens: '}', ')'.\n" +
+                                 "2 + (4*{"                            + " \n" + 
+                                 "    ^  ^ ");
 		expressionMessageMap.put("2 + (4*3] - 7", 
-				                 "Expression can not be close with closetoken ']'. Expected closetoken ')'.\n" + 
-                                 "2 + (4*3] - 7" + " \n" + 
+                                 "Expression can not be close with closetoken ']'. Expected closetoken ')'.\n" + 
+                                 "2 + (4*3] - 7"                       + " \n" + 
                                  "    ^   ^     ");
 		
-		/*expressionMessageMap.put("2 + (4*3) - 7) + 2", "\n" + 
-                                 "2 + (4*3) - 7) + 2" + " \n" + 
-                                 "             ^    " + " \n" +
-                                 "Missing open token '(' for closing token ')'.");*/
+		expressionMessageMap.put("2 + (4*3) - 7) + 2",
+                                 "Expression does not require a closetoken. Remove closetoken ')'.\n" +
+                                 "2 + (4*3) - 7) + 2"                  + " \n" + 
+                                 "             ^     ");
 		// @formatter:on
 
 		expressionMessageMap.forEach((expression, message) -> {

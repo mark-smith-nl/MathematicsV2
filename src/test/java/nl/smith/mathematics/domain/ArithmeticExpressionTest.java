@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import nl.smith.mathematics.exceptions.ArithmeticExpressionCloseException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionException;
+import nl.smith.mathematics.exceptions.ArithmeticExpressionIllegalCharacterException;
 
 public class ArithmeticExpressionTest {
 
@@ -20,7 +22,7 @@ public class ArithmeticExpressionTest {
 	private ArithmeticExpression arithmeticSubExpression;
 
 	@Test
-	public void expression_NoAggregationOpenToken_NoContent() throws ArithmeticExpressionCloseException {
+	public void expression_NoAggregationOpenToken_NoContent() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression();
 
 		assertThat(arithmeticExpression.toString(), is("..."));
@@ -31,7 +33,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_NoAggregationOpenToken_WithContent() throws ArithmeticExpressionCloseException {
+	public void expression_NoAggregationOpenToken_WithContent() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression();
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -45,7 +47,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_NoAggregationOpenToken_WithContent_ExtraCloseToken() throws ArithmeticExpressionCloseException {
+	public void expression_NoAggregationOpenToken_WithContent_ExtraCloseToken() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression();
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -58,7 +60,6 @@ public class ArithmeticExpressionTest {
 			LOGGER.info("An expected exception of type '{}' was thrown.", ArithmeticExpressionCloseException.class);
 			assertThat(e.getMessage(), is("Expression does not require a closetoken. Remove closetoken ')'."));
 		}
-
 	}
 
 	@Test
@@ -73,7 +74,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_WithAggregationOpenToken_NoContent() throws ArithmeticExpressionCloseException {
+	public void expression_WithAggregationOpenToken_NoContent() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('('));
 
 		assertThat(arithmeticExpression.toString(), is("(..."));
@@ -84,7 +85,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_WithAggregationOpenToken_WithContent() throws ArithmeticExpressionCloseException {
+	public void expression_WithAggregationOpenToken_WithContent() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('('));
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -98,7 +99,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_WithAggregationOpenToken_WithContent_WrongCloseToken() throws ArithmeticExpressionCloseException {
+	public void expression_WithAggregationOpenToken_WithContent_WrongCloseToken() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('('));
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -116,7 +117,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_WithAggregationOpenToken_WithContent_NoCloseToken() throws ArithmeticExpressionCloseException {
+	public void expression_WithAggregationOpenToken_WithContent_NoCloseToken() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('('));
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -134,7 +135,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_WithAggregationOpenToken_WithContentAndSubExpressions() throws ArithmeticExpressionCloseException {
+	public void expression_WithAggregationOpenToken_WithContentAndSubExpressions() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression();
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -169,7 +170,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_Append_WithCharacterAfterClose() throws ArithmeticExpressionCloseException {
+	public void expression_Append_WithCharacterAfterClose() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression();
 
 		arithmeticExpression.add('1');
@@ -188,7 +189,7 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void expression_Append_WithExpressionAfterClose() throws ArithmeticExpressionCloseException {
+	public void expression_Append_WithExpressionAfterClose() throws ArithmeticExpressionException {
 		arithmeticExpression = new ArithmeticExpression();
 		arithmeticExpression.add('1');
 		arithmeticExpression.add('+');
@@ -207,30 +208,19 @@ public class ArithmeticExpressionTest {
 	}
 
 	@Test
-	public void test() throws ArithmeticExpressionCloseException {
-		arithmeticExpression = new ArithmeticExpression(aggregationTokenSets.getAggregationTokenForCharacter('('));
+	public void test() throws ArithmeticExpressionException {
+		arithmeticExpression = new ArithmeticExpression();
 		arithmeticExpression.add('1');
 		System.out.println(arithmeticExpression);
 		arithmeticExpression.add('+');
-		System.out.println(arithmeticExpression);
-		arithmeticExpression.add('2');
-		System.out.println(arithmeticExpression);
-		arithmeticExpression.add('+');
-		System.out.println(arithmeticExpression);
-		arithmeticExpression.add('3');
-		System.out.println(arithmeticExpression);
 
-		arithmeticExpression.add(',');
-		System.out.println(arithmeticExpression);
-		arithmeticExpression.add('4');
-		System.out.println(arithmeticExpression);
-		arithmeticExpression.add('*');
-		System.out.println(arithmeticExpression);
-		arithmeticExpression.add('6');
-		System.out.println(arithmeticExpression);
-
-		arithmeticExpression.close(')');
-		System.out.println(arithmeticExpression);
+		try {
+			arithmeticExpression.add('@');
+			throw new IllegalArgumentException(String.format("An exception of type '%s' should have been thrown.", ArithmeticExpressionIllegalCharacterException.class));
+		} catch (ArithmeticExpressionIllegalCharacterException e) {
+			LOGGER.info("An expected exception of type '{}' was thrown.", ArithmeticExpressionIllegalCharacterException.class);
+			assertThat(e.getMessage(), is("Illegal character '@'.\n Accepted expression characters are [a-zA-Z_\\s\\d\\^\\-\\*/\\+\\.]."));
+		}
 
 	}
 

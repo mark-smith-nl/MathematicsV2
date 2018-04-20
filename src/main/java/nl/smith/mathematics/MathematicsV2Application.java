@@ -23,6 +23,5 @@ public class MathematicsV2Application implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException {
-		System.out.println(arithmeticExpressionService.buildArithmeticExpression("2+3*(9-0){(6-7)*6+5-[8-6"));
 	}
 }
