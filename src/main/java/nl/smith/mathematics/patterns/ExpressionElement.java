@@ -2,25 +2,13 @@ package nl.smith.mathematics.patterns;
 
 public class ExpressionElement {
 
-	/** 
-	 * <pre>
-	 * ℕ*: 1, 2, 3, ... (positive integer)
-	 * </pre>
-	 */
+	/** ℕ*: 1, 2, 3, ... */
 	public static final String POSITIVE_NATURAL_NUMBER = "[1-9]\\d*";
 
-	/** 
-	 * <pre>
-	 * ℕ0: 0, 1, 2, 3, ... (non negative integer)
-	 * </pre>
-	 */
+	/** ℕ0: 0, 1, 2, 3, ... */
 	public static final String NATURAL_NUMBER = "0|" + POSITIVE_NATURAL_NUMBER;
 
-	/** 
-	 * <pre>
-	 *  ℤ: ..., -3, -2, -1, 0, 1, 2, 3, ... (integer)
-	 * </pre>
-	 */
+	/** ℤ: ..., -3, -2, -1, 0, 1, 2, 3, ... */
 	public static final String INTEGER = "[\\-]?" + POSITIVE_NATURAL_NUMBER + "|0";
 
 	/**
@@ -57,10 +45,7 @@ public class ExpressionElement {
 	public static final String DECIMAL_NUMBER = "((" + INTEGER + ")(" + FRACTION + ")?)" + "|(\\-0" + FRACTION + ")";
 
 	/**
-	 * <pre>
-	 * Example of numbers using scientific notation: −5.3×10<sup>4</sup> ⇒ -5.3E104
-	 * Groups:
-	 * </pre>
+	 * Example of numbers using scientific notation: −5.3×104 ===> -5.3E104
 	 */
 	public static final String SCIENTIFIC_NUMBER = "\\-?[1-9](" + FRACTION + ")?(E(" + INTEGER + "))";
 }
