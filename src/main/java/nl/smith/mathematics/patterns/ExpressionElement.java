@@ -59,7 +59,7 @@ public class ExpressionElement {
 	/**
 	 * <pre>
 	 * Example of numbers using scientific notation: −5.3×10<sup>4</sup> ⇒ -5.3E104
-	 * Groups
+	 * Groups:
 	 * </pre>
 	 */
 	public static final String SCIENTIFIC_NUMBER = "\\-?[1-9](" + FRACTION + ")?(E(" + INTEGER + "))";
