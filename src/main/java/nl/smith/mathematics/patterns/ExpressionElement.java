@@ -2,13 +2,25 @@ package nl.smith.mathematics.patterns;
 
 public class ExpressionElement {
 
-	/** ℕ*: 1, 2, 3, ... */
+	/**
+	 * <pre>
+	 *  ℕ*: 1, 2, 3, ... (positive integer)
+	 * <pre>
+	 */
 	public static final String POSITIVE_NATURAL_NUMBER = "[1-9]\\d*";
 
-	/** ℕ0: 0, 1, 2, 3, ... */
+	/** 
+	 * <pre>
+	 * ℕ0: 0, 1, 2, 3, ... (non negative integer)
+	 * </pre>
+	 */
 	public static final String NATURAL_NUMBER = "0|" + POSITIVE_NATURAL_NUMBER;
 
-	/** ℤ: ..., -3, -2, -1, 0, 1, 2, 3, ... */
+	/** 
+	 * <pre>
+	 * ℤ: ..., -3, -2, -1, 0, 1, 2, 3, ... (integer)
+	 * </pre>
+	 */
 	public static final String INTEGER = "[\\-]?" + POSITIVE_NATURAL_NUMBER + "|0";
 
 	/**
