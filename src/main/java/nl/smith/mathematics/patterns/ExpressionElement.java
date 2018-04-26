@@ -30,6 +30,7 @@ public class ExpressionElement {
 	 * </pre>
 	 */
 	public static final String FRACTION = "(\\.)(\\d*[1-9])";
+	public static final String FRACTION2 = "(\\.)(\\d*)(([1-9])|(\\d*\\|\\d*[1-9]\\d*\\|R))";
 	/**
 	 * <pre>
 	 * ℚ (Rational/Decimal number)

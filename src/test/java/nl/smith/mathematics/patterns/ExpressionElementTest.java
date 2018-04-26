@@ -2,6 +2,7 @@ package nl.smith.mathematics.patterns;
 
 import static nl.smith.mathematics.patterns.ExpressionElement.DECIMAL_NUMBER;
 import static nl.smith.mathematics.patterns.ExpressionElement.FRACTION;
+import static nl.smith.mathematics.patterns.ExpressionElement.FRACTION2;
 import static nl.smith.mathematics.patterns.ExpressionElement.INTEGER;
 import static nl.smith.mathematics.patterns.ExpressionElement.POSITIVE_INTEGER;
 import static nl.smith.mathematics.patterns.ExpressionElement.SCIENTIFIC_NUMBER;
@@ -59,16 +60,21 @@ public class ExpressionElementTest {
 		});
 	}
 
-	/*
-	 * @Test public void fraction2() { Pattern pattern = Pattern.compile(FRACTION); Arrays.asList(".|1|R", ".0|1|R", ".0234|12|R").forEach(value -> { Matcher matcher =
-	 * pattern.matcher(value); assertTrue(String.format("Value '%s' should be accepted as a fraction.", value), matcher.matches()); assertThat(matcher.groupCount(), is(2));
-	 * assertThat(matcher.group(1), is(".")); });
-	 * 
-	 * Arrays.asList(".||R", ".1|0|R", ".1|00|R").forEach(value -> { assertFalse(String.format("Value '%s' should not be accepted as a fraction.", value), value.matches(FRACTION));
-	 * });
-	 * 
-	 * }
-	 */
+	@Test
+	public void fraction2() {
+		Pattern pattern = Pattern.compile(FRACTION2);
+		Arrays.asList(".|1|R", ".0|1|R", ".0234|12|R").forEach(value -> {
+			Matcher matcher = pattern.matcher(value);
+			assertTrue(String.format("Value '%s' should be accepted as a fraction.", value), matcher.matches());
+			assertThat(matcher.groupCount(), is(5));
+			// assertThat(matcher.group(1), is("."));
+		});
+
+		Arrays.asList(".||R", ".1|0|R", ".1|00|R").forEach(value -> {
+			assertFalse(String.format("Value '%s' should not be accepted as a fraction.", value), value.matches(FRACTION));
+		});
+
+	}
 
 	@Test
 	public void decimalNumber() {
@@ -144,8 +150,7 @@ public class ExpressionElementTest {
 	}
 
 	public static void main(String[] args) {
-		System.out.println(FRACTION);
-		// (\.)( (\d*[1-9])|(\d*\|\d*[1-9]\d*\|R) )
-		//
+		Pattern pattern = Pattern.compile(FRACTION2);
+		System.out.println(pattern);
 	}
 }
